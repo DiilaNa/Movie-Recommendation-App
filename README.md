@@ -77,13 +77,14 @@ Run the app:
 streamlit run app.py
 ```
 ## Live Demo
-[Click here to see the live app on Streamlit]("https://movie-recommendation-app-74mux7mwl8vazsgfshaavp.streamlit.app/")
+[Click here to see the live app on Streamlit](https://movie-recommendation-app-74mux7mwl8vazsgfshaavp.streamlit.app/)
 
 ## GitHub Repository
-[View the GitHub repo]("https://github.com/DiilaNa/Movie-Recommendation-App.git")
+[View the GitHub repo](https://github.com/DiilaNa/Movie-Recommendation-App.git)
 
 ## Author
-### Dilan Liyanaarachchi
+- Dilan Liyanaarachchi
 
 ### YouTube Demo
 [Watch the YouTube Demo](YOUTUBE_LINK)
+
