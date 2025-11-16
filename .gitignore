@@ -1,15 +1,38 @@
-# Python cache files
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
 
-# Jupyter Notebook checkpoints
+# Environment / virtualenv
+.env
+.venv/
+venv/
+ENV/
+env/
+*.env
+
+# Streamlit secrets
+.streamlit/secrets.toml
+
+# macOS
+.DS_Store
+
+# Logs
+*.log
+
+# Python packaging
+*.egg
+*.egg-info/
+dist/
+build/
+
+# IDE / editor settings
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter notebooks checkpoints
 .ipynb_checkpoints/
 
-# System files
-.DS_Store
-Thumbs.db
-
-.streamlit/
 
