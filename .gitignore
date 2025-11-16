@@ -19,3 +19,7 @@ Thumbs.db
 
 # Streamlit local files
 .streamlit/
+
+# Large pickle files (don’t push to GitHub)
+Assets/movies.pkl
+Assets/similarity.pkl
