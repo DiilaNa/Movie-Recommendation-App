@@ -2,69 +2,71 @@ import streamlit as st
 import pickle
 import pandas as pd
 import requests
-
 import os
 from dotenv import load_dotenv
+import gdown  # for large Google Drive files
 
-# Load .env file
+# ------------------- Load environment variables -------------------
 load_dotenv()
-
-# Get API key
 API_KEY = os.getenv("API_KEY")
+FILE_ID = os.getenv("FILE_ID")  # Google Drive file ID for similarity.pkl
 
 if not API_KEY:
     raise ValueError("API_KEY not found. Please check your .env file or Streamlit secrets.")
+if not FILE_ID:
+    raise ValueError("FILE_ID not found. Please check your .env file or Streamlit secrets.")
 
+# ------------------- Function to load Google Drive pickle -------------------
+def load_pkl_from_gdrive(file_id, output_name="similarity.pkl"):
+    url = f"https://drive.google.com/uc?id={file_id}"
+    if not os.path.exists(output_name):
+        st.info("Downloading similarity file from Google Drive...")
+        gdown.download(url, output_name, quiet=False)
+    with open(output_name, "rb") as f:
+        data = pickle.load(f)
+    return data
+
+# ------------------- Load Data -------------------
+# Movies dictionary from local file
 movies_dict = pickle.load(open(os.path.join("Assets", "movies.pkl"), "rb"))
-similarity = pickle.load(open(os.path.join("Assets", "similarity.pkl"), "rb"))
+movies = pd.DataFrame(movies_dict)
 
-# similarity = pickle.load(open('Assets/similarity.pkl','rb'))
+# Similarity matrix from Google Drive
+similarity = load_pkl_from_gdrive(FILE_ID)
 
+# ------------------- Helper Functions -------------------
 def fetch_poster(movie_id):
-    response = requests.get('https://api.themoviedb.org/3/movie/{}?api_key={}&language=en-US'.format(movie_id,API_KEY))
+    response = requests.get(
+        f'https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}&language=en-US'
+    )
     data = response.json()
     return "https://image.tmdb.org/t/p/w500" + data['poster_path']
-
 
 def recommend(movie):
     movie_index = movies[movies['title'] == movie].index[0]
     distances = similarity[movie_index]
-    movies_list = sorted(list(enumerate(distances)),reverse=True,key=lambda x:x[1])[1:6]
+    movies_list = sorted(list(enumerate(distances)), reverse=True, key=lambda x: x[1])[1:6]
 
     recommended_movies = []
     recommended_movies_posters = []
     for i in movies_list:
-        movie_id = movies.iloc[i[0]].movie_id 
+        movie_id = movies.iloc[i[0]].movie_id
         recommended_movies.append(movies.iloc[i[0]].title)
-        # fetch poster from API
         recommended_movies_posters.append(fetch_poster(movie_id))
-    return recommended_movies,recommended_movies_posters
+    return recommended_movies, recommended_movies_posters
 
-# movies_dict = pickle.load(open('Assets/movies.pkl','rb'))
-movies = pd.DataFrame(movies_dict)
-st.title('Movie Recommender System')
+# ------------------- Streamlit App -------------------
+st.title('🎬 Movie Recommender System')
 
 selected_movie_name = st.selectbox(
-    "How would you like to be contacted?",
+    "Select a movie:",
     movies['title'].values
 )
 
-
 if st.button("Recommend", type="primary"):
-    names,posters = recommend(selected_movie_name)
-    col1, col2 , col3, col4, col5 = st.columns(5)
-    with col1:
-        st.text(names[0])
-        st.image(posters[0])
-    with col2:
-        st.text(names[1])
-        st.image(posters[1])
-    with col3:
-        st.text(names[2])
-        st.image(posters[2])
-    with col4:
-        st.text(names[3])
-        st.image(posters[3])
-    with col5:
-        st.text(names[4])
-        st.image(posters[4])
+    names, posters = recommend(selected_movie_name)
+    col1, col2, col3, col4, col5 = st.columns(5)
+    for idx, col in enumerate([col1, col2, col3, col4, col5]):
+        with col:
+            st.text(names[idx])
+            st.image(posters[idx])
